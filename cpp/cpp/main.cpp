@@ -12,6 +12,11 @@ struct pipe
     int id;
     double length;
 };
+//struct cs
+//{
+//    int id;
+ //   int ;
+//};
 void PrintPipe(pipe&p)
 {
     cout<<"You entered:"<<p.length<<endl;
