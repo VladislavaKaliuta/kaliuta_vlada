@@ -6,11 +6,30 @@
 //
 
 #include <iostream>
-
 using namespace std;
+struct pipe
+{
+    int id;
+    double length;
+};
+void PrintPipe(pipe&p)
+{
+    cout<<"You entered:"<<p.length<<endl;
+}
+pipe CreatePipe()
+{
+    pipe p;
+    p.id=0;
+    cout<<"Enter length:";
+    cin>>p.length;
+    return p;
+}
 
-int main(int argc, const char * argv[]) {
+
+
+int main() {
     // insert code here...
-    cout << "Hello, World!"<< endl;
+    pipe p=CreatePipe();
+    PrintPipe(p);
     return 0;
 }
