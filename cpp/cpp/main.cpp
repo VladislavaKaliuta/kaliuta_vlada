@@ -11,30 +11,59 @@ struct pipe
 {
     int id;
     double length;
+    double diameter;
 };
-//struct cs
-//{
-//    int id;
- //   int ;
-//};
-void PrintPipe(pipe&p)
+struct station
 {
-    cout<<"You entered:"<<p.length<<endl;
-}
+    int id;
+    string name;
+    int tsekh;
+    int worktsekh;
+};
+pipe P;
+station S;
+
 pipe CreatePipe()
 {
     pipe p;
     p.id=0;
     cout<<"Enter length:";
     cin>>p.length;
+    cout<<"Enter diameter:";
+    cin>>p.diameter;
     return p;
+}
+station CreateStation()
+{
+    station s;
+    s.id=0;
+    cout<<"Enter name:";
+    cin>>s.name;
+    cout<<"Enter tsekh:";
+    cin>>s.tsekh;
+    cout<<"Enter worktsekh:";
+    cin>>s.worktsekh;
+    return s;
+}
+void PrintPipe(const pipe& p)
+{
+    cout<<"Pipe length:"<<p.length<<"\tdiameter:"<<p.diameter<<endl;
+}
+void PrintStation(const station& s)
+{
+    cout<<"Station name:"<<s.name<<"\ttsekh:"<<s.tsekh<<"\tworktsekh:"<<s.worktsekh<<endl;
+}
+void EditPipe(pipe& p)
+{
+    p.length-=1;
 }
 
 
-
 int main() {
-    // insert code here...
     pipe p=CreatePipe();
+    station s=CreateStation();
     PrintPipe(p);
+    PrintStation(s);
+    EditPipe(p);
     return 0;
 }
