@@ -26,15 +26,15 @@ T GetCorrectNumber(T min, T max)
 }
 struct pipe
 {
-    int id = 0;
+    int id;
     double length = 0;
     double diameter = 0;
-    bool sign = 1;
+    bool vremont = 1;
 };
 
 struct station
 {
-    int id_st = 0;
+    int id_st;
     string name;
     int tsekh = 0;
     int worktsekh = 0;
@@ -43,7 +43,18 @@ struct station
 
 void EditPipe(pipe& p)
 {
-    p.sign = (!p.sign);
+    p.vremont = (!p.vremont);
+}
+void EditStation(station& s)
+{
+    if (s.tsekh != 0)
+        {
+            
+            cout << "Enter a new number  of work tsekh:";
+             s.worktsekh = GetCorrectNumber(0,s.tsekh);
+        }
+        else
+            cout << "Number of tsekh = 0. Add tsekh to edit work tsekh!" << endl;
 }
 void SavePipeandStation(const pipe& p, const station& s)
 {
@@ -57,16 +68,16 @@ void SavePipeandStation(const pipe& p, const station& s)
     {
         if (p.length != 0 && p.diameter != 0)
         {
-            fout << p.id << endl <<  p.length << endl << p.diameter << endl << p.sign << endl;
+            fout << "Pipe:" << endl << p.id << endl <<  p.length << endl << p.diameter << endl << p.vremont << endl;
         }
-        else
-            cout << "Pipe didn't create!" << endl;
+        /*else
+            cout << "Pipe didn't create!" << endl;*/
         if (s.tsekh != 0)
         {
-            fout << s.id_st << endl << s.name << endl << s.tsekh << endl << s.worktsekh  << endl << s.effect << endl;
+            fout << "Station:" << endl << s.id_st << endl << s.name << endl << s.tsekh << endl << s.worktsekh  << endl << s.effect << endl;
         }
-        else
-            cout << "Station didn't create!" << endl;
+        /*else
+            cout << "Station didn't create!" << endl;*/
         
     fout.close();
     }
@@ -74,30 +85,40 @@ void SavePipeandStation(const pipe& p, const station& s)
 
  void LoadPipeandStation( pipe& p, station& s)
  {
-    
-    ifstream fin;
+     
+     ifstream fin;
     fin.open("data.txt");
     if (!fin.is_open())
     {
         cout << "File open error!" << endl;
+        p={};
+        s={};
+        return;
     }
-    else
+     while (!fin.ios_base::eof())
+    {
+        string str;
+        fin>>ws;
+        getline(fin, str);
+        if (str == "Pipe:")
         {
             fin >> p.id;
             fin >> p.length;
             fin >> p.diameter;
-            fin >> p.sign;
+            fin >> p.vremont;
+        }
+        else if (str == "Station:")
+        {
             fin >> s.id_st;
-            fin >> s.name;
+            fin >> ws;
+            getline(fin, s.name);
             fin >> s.tsekh;
             fin >> s.worktsekh;
             fin >> s.effect;
-            
-            }
-    
-     fin.close();
-
+        }
     }
+     fin.close();
+}
  
 void Printmenu()
 {
@@ -106,8 +127,9 @@ void Printmenu()
     << "(3) Create Compressor station" << endl
     << "(4) Print Compressor station" << endl
     << "(5) Edit Pipe" << endl
-    << "(6) Save to file" << endl
-    << "(7) Load from file" << endl
+    << "(6) Edit Station" << endl
+    << "(7) Save to file" << endl
+    << "(8) Load from file" << endl
     << "(0) Exit" << endl
     << "Enter number, please:" << endl;
 }
@@ -118,14 +140,14 @@ ostream& operator << (ostream& out, const pipe& p)
 }
 istream& operator >> (istream& in, pipe& p)
 {
-    cout << "Enter pipe id:";
-    cin >> p.id;
+    //cout << "Enter pipe id:";
+    p.id = 0;
     cout << "Enter length:";
     p.length = GetCorrectNumber(0.0, 1000.0);
     cout << "Enter diameter:";
     p.diameter = GetCorrectNumber(0.0, 1000.0);
-    cout << "Enter sign:";
-    cin >> p.sign;
+    //cout << "Enter sign:";
+    p.vremont = false;
     return in;
 }
 
@@ -137,22 +159,23 @@ ostream& operator << (ostream& out, const station& s)
 
 istream& operator >> (istream& in, station& s)
 {
-    cout << "Enter station id:";
-    cin >> s.id_st;
+    //cout << "Enter station id:";
+    s.id_st = 0;
     cout << "Enter name:";
-    cin.ignore(2000, '\n');
+    //cin.ignore(2000, '\n');
+    cin>>ws;
     getline(cin, s.name);
     cout << "Enter tsekh:";
     s.tsekh = GetCorrectNumber(0, 50);
     cout << "Enter  work tsekh:";
-    s.worktsekh = GetCorrectNumber(0, 50);
-    while (s.worktsekh > s.tsekh || s.worktsekh < 0)
+    s.worktsekh = GetCorrectNumber(0, s.tsekh);
+   /* while (s.worktsekh > s.tsekh || s.worktsekh < 0)
     {
     cout << "Enter  work tsekh (<tsekh) again:";
     s.worktsekh = GetCorrectNumber(0, 50);
-    }
+    }*/
     cout<<"Enter  efficiency:";
-    cin >> s.effect;
+    s.effect = GetCorrectNumber(0,10);/////!!!!!!!!!!
     return in;
 }
 
@@ -162,7 +185,7 @@ int main() {
     while (1)
     {
         Printmenu();
-        switch (GetCorrectNumber(0, 7))
+        switch (GetCorrectNumber(0, 8))
         {
             case 1:
             {
@@ -171,7 +194,11 @@ int main() {
             }
             case 2:
             {
+                //!!!!!!!!
+                if (p.id == 0)
                 cout << p << endl;
+                else
+                    cout << "Pipe didn't create!" << endl;
                 break;
             }
             case 3:
@@ -181,22 +208,37 @@ int main() {
             }
             case 4:
             {
+                //!!!!!!!!!
+                if (s.id_st == 0)
                 cout << s << endl;
+                else
+                    cout << "Station didn't create!" << endl;
                 break;
             }
             
             case 5:
             {
+                //!!!!!!!!
+                if (p.id == 0)
                 EditPipe(p);
+                else
+                    cout << "Pipe didn't create!" << endl;
                 break;
             }
             case 6:
             {
-                SavePipeandStation(p,s);
-                
+                if (s.id_st == 0)
+                EditStation(s);
+                else
+                    cout << "Station didn't create!" <<endl;
                 break;
             }
             case 7:
+            {
+                SavePipeandStation(p,s);
+                break;
+            }
+            case 8:
             {
                 LoadPipeandStation(p,s);
                 break;
