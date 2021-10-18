@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+
 using namespace std;
 
 template <typename T>
@@ -28,7 +29,7 @@ struct pipe
     int id = 0;
     double length = 0;
     double diameter = 0;
-    bool sign = false;
+    bool sign = 1;
 };
 
 struct station
@@ -40,16 +41,10 @@ struct station
     double effect = 0;
 };
 
-/*void EditPipe(pipe& p)
+void EditPipe(pipe& p)
 {
-    if (p.length != 0 && p.diameter != 0)
-    {
-        cout << "Enter a new pipe sign" << endl;
-        cin << p.sign;
-    }
-    else
-        cout << "Pipe didn't create" << endl;
-}*/
+    p.sign = (!p.sign);
+}
 void SavePipeandStation(const pipe& p, const station& s)
 {
     ofstream fout;
@@ -62,13 +57,13 @@ void SavePipeandStation(const pipe& p, const station& s)
     {
         if (p.length != 0 && p.diameter != 0)
         {
-            fout << "Pipe:" << endl <<  p.length << endl << p.diameter << endl << p.sign << endl;
+            fout << p.id << endl <<  p.length << endl << p.diameter << endl << p.sign << endl;
         }
         else
             cout << "Pipe didn't create!" << endl;
         if (s.tsekh != 0)
         {
-            fout << "Compressor station:" << endl << s.name << endl << s.tsekh << endl << s.worktsekh  << endl << s.effect << endl;
+            fout << s.id_st << endl << s.name << endl << s.tsekh << endl << s.worktsekh  << endl << s.effect << endl;
         }
         else
             cout << "Station didn't create!" << endl;
@@ -76,77 +71,34 @@ void SavePipeandStation(const pipe& p, const station& s)
     fout.close();
     }
 }
-/*void LoadPipeandStation(pipe& p, station& s)
-{
-    ifstream fin;
+
+ void LoadPipeandStation( pipe& p, station& s)
+ {
     
-    fin.open("data.txt", ios::in);
+    ifstream fin;
+    fin.open("data.txt");
     if (!fin.is_open())
     {
         cout << "File open error!" << endl;
     }
     else
-    {
-        string str;
-        getline(fin,str);
-        if (str == "Pipe:")
         {
-            while (!fin.eof())
-        {
-            str = "";
-            getline(fin, str);
-            cout << str << endl;
-        }
+            fin >> p.id;
+            fin >> p.length;
+            fin >> p.diameter;
+            fin >> p.sign;
+            fin >> s.id_st;
+            fin >> s.name;
+            fin >> s.tsekh;
+            fin >> s.worktsekh;
+            fin >> s.effect;
             
-        }
-       else
-        {
-            
-        }
+            }
     
+     fin.close();
+
     }
-    fin.close();
-}*/
-pipe LoadPipe()
- {
-    pipe p;
-    ifstream fin;
-    fin.open("data.txt", ios::in);
-    if (!fin.is_open())
-    {
-        cout << "File open error!" << endl;
-    }
-    else
-     {
-         fin >> p.length;
-         fin >> p.diameter;
-         fin >> p.sign;
-         fin.close();
-     }
-     return p;
-
- }
- station LoadStation()
- {
-     station s;
-     ifstream fin;
-     fin.open("data.txt", ios::in);
-     if (!fin.is_open())
-     {
-         cout << "File open error!" << endl;
-     }
-     else
-     {
-         fin >> s.name;
-         fin >> s.tsekh;
-         fin >> s.worktsekh;
-         fin >> s.effect;
-         fin.close();
-     }
-     return s;
-
- }
-
+ 
 void Printmenu()
 {
     cout << "(1) Create Pipe" << endl
@@ -161,14 +113,16 @@ void Printmenu()
 }
 ostream& operator << (ostream& out, const pipe& p)
 {
-    out << "Pipe length:" << p.length << "\tdiameter:" << p.diameter << "\tsign:" << endl;
+    out << "Pipe id:" << p.id << "\tlength:" << p.length << "\tdiameter:" << p.diameter << "\tsign:" << endl;
     return out;
 }
 istream& operator >> (istream& in, pipe& p)
 {
-    cout<<"Enter length:";
+    cout << "Enter pipe id:";
+    cin >> p.id;
+    cout << "Enter length:";
     p.length = GetCorrectNumber(0.0, 1000.0);
-    cout<<"Enter diameter:";
+    cout << "Enter diameter:";
     p.diameter = GetCorrectNumber(0.0, 1000.0);
     cout << "Enter sign:";
     cin >> p.sign;
@@ -177,18 +131,26 @@ istream& operator >> (istream& in, pipe& p)
 
 ostream& operator << (ostream& out, const station& s)
 {
-    out << "Station name:" << s.name << "\ttsekh:" << s.tsekh << "\twork tsekh:" << s.worktsekh << "\tefficiency:" << s.effect << endl;
+    out << "Station id:" << s.id_st << "\tname:" << s.name << "\ttsekh:" << s.tsekh << "\twork tsekh:" << s.worktsekh << "\tefficiency:" << s.effect << endl;
     return out;
 }
 
 istream& operator >> (istream& in, station& s)
 {
+    cout << "Enter station id:";
+    cin >> s.id_st;
     cout << "Enter name:";
-    cin >> s.name;
-    cout<<"Enter tsekh:";
-    s.tsekh = GetCorrectNumber(0, 1000);
-    cout<<"Enter  work tsekh:";
-    s.worktsekh = GetCorrectNumber(0, 1000);
+    cin.ignore(2000, '\n');
+    getline(cin, s.name);
+    cout << "Enter tsekh:";
+    s.tsekh = GetCorrectNumber(0, 50);
+    cout << "Enter  work tsekh:";
+    s.worktsekh = GetCorrectNumber(0, 50);
+    while (s.worktsekh > s.tsekh || s.worktsekh < 0)
+    {
+    cout << "Enter  work tsekh (<tsekh) again:";
+    s.worktsekh = GetCorrectNumber(0, 50);
+    }
     cout<<"Enter  efficiency:";
     cin >> s.effect;
     return in;
@@ -225,7 +187,7 @@ int main() {
             
             case 5:
             {
-                // EditPipe(p);
+                EditPipe(p);
                 break;
             }
             case 6:
@@ -236,9 +198,7 @@ int main() {
             }
             case 7:
             {
-                LoadPipe();
-               // LoadStation();
-                //LoadPipeandStation(pp, st);
+                LoadPipeandStation(p,s);
                 break;
             }
             case 0:
