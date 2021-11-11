@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <vector>
 
 using namespace std;
 
@@ -56,34 +57,28 @@ void EditStation(station& s)
         else
             cout << "Number of tsekh = 0. Add tsekh to edit work tsekh!" << endl;
 }
-void SavePipeandStation(const pipe& p, const station& s)
+void SavePipe(ofstream& fout, const pipe& p)
 {
-    ofstream fout;
-    fout.open("data.txt", ios::out);
-    if (!fout.is_open())
+    if (p.length != 0 && p.diameter != 0)
     {
-        cout << "File open error!" << endl;
-    }
-    else
-    {
-        if (p.length != 0 && p.diameter != 0)
-        {
-            fout << "Pipe:" << endl << p.id << endl <<  p.length << endl << p.diameter << endl << p.vremont << endl;
+    fout << "Pipe:" << endl << p.id << endl <<  p.length << endl << p.diameter << endl << p.vremont << endl;
         }
         /*else
             cout << "Pipe didn't create!" << endl;*/
-        if (s.tsekh != 0)
-        {
-            fout << "Station:" << endl << s.id_st << endl << s.name << endl << s.tsekh << endl << s.worktsekh  << endl << s.effect << endl;
-        }
-        /*else
-            cout << "Station didn't create!" << endl;*/
-        
-    fout.close();
+       
     }
+
+void SaveStation(ofstream& fout, const station& s)
+{
+    if (s.tsekh != 0)
+    {
+        fout << "Station:" << endl << s.id_st << endl << s.name << endl << s.tsekh << endl << s.worktsekh  << endl << s.effect << endl;
+    }
+    /*else
+        cout << "Station didn't create!" << endl;*/
 }
 
- void LoadPipeandStation( pipe& p, station& s)
+ void LoadPipeandStation(ifstream& fin, pipe& p, station& s)
  {
      
      ifstream fin;
@@ -175,13 +170,27 @@ istream& operator >> (istream& in, station& s)
     s.worktsekh = GetCorrectNumber(0, 50);
     }*/
     cout<<"Enter  efficiency:";
-    s.effect = GetCorrectNumber(0,10);/////!!!!!!!!!!
+    s.effect = GetCorrectNumber(0,10);
     return in;
 }
 
+pipe& SelectPipe(vector<pipe>& pg)
+{
+    cout << "Enter index: ";
+    unsigned int index = GetCorrectNumber (1u, (unsigned int) pg.size());
+    return pg[index-1];
+}
+
+station& SelectStation(vector<station>& sg)
+{
+    cout << "Enter index: ";
+    unsigned int index = GetCorrectNumber (1u, (unsigned int) sg.size());
+    return sg[index-1];
+}
+
 int main() {
-    pipe p;
-    station s;
+    vector<pipe> pgroup;
+    vector<station> sgroup;
     while (1)
     {
         Printmenu();
@@ -189,55 +198,71 @@ int main() {
         {
             case 1:
             {
+                pipe p;
                 cin >> p;
+                pgroup.push_back(p);
                 break;
             }
             case 2:
             {
-                //!!!!!!!!
-                if (p.id == 0)
-                cout << p << endl;
-                else
-                    cout << "Pipe didn't create!" << endl;
+                //if (p.id == 0)
+                cout << SelectPipe(pgroup) << endl;
+               // else
+                   // cout << "Pipe didn't create!" << endl;
                 break;
             }
             case 3:
             {
+                station s;
                 cin >> s;
+                sgroup.push_back(s);
                 break;
             }
             case 4:
             {
-                //!!!!!!!!!
-                if (s.id_st == 0)
-                cout << s << endl;
-                else
-                    cout << "Station didn't create!" << endl;
+                //if (s.id_st == 0)
+                cout << SelectStation(sgroup) << endl;
+                //else
+                    //cout << "Station didn't create!" << endl;
                 break;
             }
             
             case 5:
             {
-                //!!!!!!!!
-                if (p.id == 0)
-                EditPipe(p);
-                else
-                    cout << "Pipe didn't create!" << endl;
+                //if (p.id == 0)
+                EditPipe(SelectPipe(pgroup));
+                //else
+                    //cout << "Pipe didn't create!" << endl;
                 break;
             }
             case 6:
             {
-                if (s.id_st == 0)
-                EditStation(s);
-                else
-                    cout << "Station didn't create!" <<endl;
+                //if (s.id_st == 0)
+                EditStation(SelectStation(sgroup));
+                //else
+                    //cout << "Station didn't create!" <<endl;
                 break;
             }
             case 7:
             {
-                SavePipeandStation(p,s);
+                ofstream fout;
+                fout.open("data.txt", ios::out);
+                if (!fout.is_open())
+                {
+                    cout << "File open error!" << endl;
+                }
+                else
+                {
+                    for(pipe p:pgroup)
+                        SavePipe(fout, p);
+                    for (station s:sgroup)
+                        SaveStation(fout, s);
+                        
+                        fout.close();
+                }
                 break;
             }
+         
             case 8:
             {
                 LoadPipeandStation(p,s);
