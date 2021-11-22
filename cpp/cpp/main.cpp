@@ -9,59 +9,28 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include "pipe.hpp"
+#include "station.hpp"
+#include "utils.h"
+
 
 using namespace std;
 
-template <typename T>
-T GetCorrectNumber(T min, T max)
-{
-    T x;
-    while ((cin >> x).fail() || x < min || x > max)
-    {
-        cin.clear();
-        cin.ignore(10000, '\n');
-        cout << "Enter number (" << min << "-" << max <<") again:";
-    }
-    return x;
-    
-}
-struct pipe
-{
-    int id;
-    double length = 0;
-    double diameter = 0;
-    bool vremont = 1;
-};
-
-struct station
-{
-    int id_st;
-    string name;
-    int tsekh = 0;
-    int worktsekh = 0;
-    double effect = 0;
-};
-
 void EditPipe(pipe& p)
 {
-    p.vremont = (!p.vremont);
+    p.EditVremont(p);
 }
+
 void EditStation(station& s)
 {
-    if (s.tsekh != 0)
-        {
-            
-            cout << "Enter a new number  of work tsekh:";
-             s.worktsekh = GetCorrectNumber(0,s.tsekh);
-        }
-        else
-            cout << "Number of tsekh = 0. Add tsekh to edit work tsekh!" << endl;
+    s.EditWorktsekh(s);
 }
+
 void SavePipe(ofstream& fout, const pipe& p)
 {
     if (p.length != 0 && p.diameter != 0)
     {
-    fout << "Pipe:" << endl << p.id << endl <<  p.length << endl << p.diameter << endl << p.vremont << endl;
+    fout << "Pipe:" << endl << p.GetID() << endl <<  p.length << endl << p.diameter << endl << p.vremont << endl;
         }
         /*else
             cout << "Pipe didn't create!" << endl;*/
@@ -72,7 +41,7 @@ void SaveStation(ofstream& fout, const station& s)
 {
     if (s.tsekh != 0)
     {
-        fout << "Station:" << endl << s.id_st << endl << s.name << endl << s.tsekh << endl << s.worktsekh  << endl << s.effect << endl;
+        fout << "Station:" << endl << s.GetID_ST() << endl << s.name << endl << s.tsekh << endl << s.worktsekh  << endl << s.effect << endl;
     }
     /*else
         cout << "Station didn't create!" << endl;*/
@@ -81,15 +50,11 @@ void SaveStation(ofstream& fout, const station& s)
  void LoadPipeandStation(ifstream& fin, pipe& p, station& s)
  {
      
-     ifstream fin;
-    fin.open("data.txt");
-    if (!fin.is_open())
-    {
-        cout << "File open error!" << endl;
-        p={};
-        s={};
-        return;
-    }
+    
+        //p={};
+        //s={};
+        //return;
+    
      while (!fin.ios_base::eof())
     {
         string str;
@@ -97,14 +62,14 @@ void SaveStation(ofstream& fout, const station& s)
         getline(fin, str);
         if (str == "Pipe:")
         {
-            fin >> p.id;
+           // fin >> p.SetID();
             fin >> p.length;
             fin >> p.diameter;
             fin >> p.vremont;
         }
         else if (str == "Station:")
         {
-            fin >> s.id_st;
+            //fin >> s.id_st;
             fin >> ws;
             getline(fin, s.name);
             fin >> s.tsekh;
@@ -112,7 +77,7 @@ void SaveStation(ofstream& fout, const station& s)
             fin >> s.effect;
         }
     }
-     fin.close();
+    
 }
  
 void Printmenu()
@@ -125,53 +90,9 @@ void Printmenu()
     << "(6) Edit Station" << endl
     << "(7) Save to file" << endl
     << "(8) Load from file" << endl
+    << "(9) Find Station by name" << endl
     << "(0) Exit" << endl
     << "Enter number, please:" << endl;
-}
-ostream& operator << (ostream& out, const pipe& p)
-{
-    out << "Pipe id:" << p.id << "\tlength:" << p.length << "\tdiameter:" << p.diameter << "\tsign:" << endl;
-    return out;
-}
-istream& operator >> (istream& in, pipe& p)
-{
-    //cout << "Enter pipe id:";
-    p.id = 0;
-    cout << "Enter length:";
-    p.length = GetCorrectNumber(0.0, 1000.0);
-    cout << "Enter diameter:";
-    p.diameter = GetCorrectNumber(0.0, 1000.0);
-    //cout << "Enter sign:";
-    p.vremont = false;
-    return in;
-}
-
-ostream& operator << (ostream& out, const station& s)
-{
-    out << "Station id:" << s.id_st << "\tname:" << s.name << "\ttsekh:" << s.tsekh << "\twork tsekh:" << s.worktsekh << "\tefficiency:" << s.effect << endl;
-    return out;
-}
-
-istream& operator >> (istream& in, station& s)
-{
-    //cout << "Enter station id:";
-    s.id_st = 0;
-    cout << "Enter name:";
-    //cin.ignore(2000, '\n');
-    cin>>ws;
-    getline(cin, s.name);
-    cout << "Enter tsekh:";
-    s.tsekh = GetCorrectNumber(0, 50);
-    cout << "Enter  work tsekh:";
-    s.worktsekh = GetCorrectNumber(0, s.tsekh);
-   /* while (s.worktsekh > s.tsekh || s.worktsekh < 0)
-    {
-    cout << "Enter  work tsekh (<tsekh) again:";
-    s.worktsekh = GetCorrectNumber(0, 50);
-    }*/
-    cout<<"Enter  efficiency:";
-    s.effect = GetCorrectNumber(0,10);
-    return in;
 }
 
 pipe& SelectPipe(vector<pipe>& pg)
@@ -187,14 +108,41 @@ station& SelectStation(vector<station>& sg)
     unsigned int index = GetCorrectNumber (1u, (unsigned int) sg.size());
     return sg[index-1];
 }
+template<typename T>
+using Filter = bool(*)(const station & s, T param);
+bool CheckByName (const station& s,string param)
+{
+    return s.name == param;
+}
+/*bool CheckByName (const station& s,string param)
+{
+    return s.name == param;
+}*/
+template<typename T>
+vector <int> FindStationByFilter(const vector<station>& sgroup, Filter<T> f, T param)
+{
+    vector <int> res;
+    int i = 0;
+    for (auto& s : sgroup)
+    {
+        if (f(s, param))
+            res.push_back(i);
+        i++;
+    }
+    
+    return res;
+}
 
 int main() {
     vector<pipe> pgroup;
     vector<station> sgroup;
+    
+   // pgroup.resize(3);
+    
     while (1)
     {
         Printmenu();
-        switch (GetCorrectNumber(0, 8))
+        switch (GetCorrectNumber(0, 9))
         {
             case 1:
             {
@@ -206,7 +154,8 @@ int main() {
             case 2:
             {
                 //if (p.id == 0)
-                cout << SelectPipe(pgroup) << endl;
+                for (const auto& p:pgroup)
+                cout << p << endl;
                // else
                    // cout << "Pipe didn't create!" << endl;
                 break;
@@ -221,7 +170,8 @@ int main() {
             case 4:
             {
                 //if (s.id_st == 0)
-                cout << SelectStation(sgroup) << endl;
+                for (auto& s:sgroup)
+                cout << s << endl;
                 //else
                     //cout << "Station didn't create!" << endl;
                 break;
@@ -253,8 +203,10 @@ int main() {
                 }
                 else
                 {
+                    fout << pgroup.size() << endl;
                     for(pipe p:pgroup)
                         SavePipe(fout, p);
+                    fout << sgroup.size() << endl;
                     for (station s:sgroup)
                         SaveStation(fout, s);
                         
@@ -265,9 +217,31 @@ int main() {
          
             case 8:
             {
-                LoadPipeandStation(p,s);
+                ifstream fin;
+                fin.open("data.txt");
+                if (!fin.is_open())
+                {
+                    cout << "File open error!" << endl;
+                }
+                else
+                {
+                    int count;
+                    fin >> count;
+                    while (count--)
+                         //group.push_back(LoadPipeandStation(fin,p,s));
+                        fin.close();
+                    
+                }
                 break;
             }
+            case 9:
+            {
+                string name = "Unknown";
+               for (int i: FindStationByFilter(sgroup, CheckByName, name))
+                   cout << sgroup[i];
+                break;
+            }
+                
             case 0:
             {
                return 0;

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1E4F8557274A6FFE004398FB /* pipe.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E4F8555274A6FFE004398FB /* pipe.cpp */; };
+		1E4F855A274A7051004398FB /* station.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E4F8558274A7051004398FB /* station.cpp */; };
 		1E967F202701199D0021B4EE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E967F1F2701199D0021B4EE /* main.cpp */; };
 /* End PBXBuildFile section */
 
@@ -23,6 +25,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1E4F8555274A6FFE004398FB /* pipe.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = pipe.cpp; sourceTree = "<group>"; };
+		1E4F8556274A6FFE004398FB /* pipe.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = pipe.hpp; sourceTree = "<group>"; };
+		1E4F8558274A7051004398FB /* station.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = station.cpp; sourceTree = "<group>"; };
+		1E4F8559274A7051004398FB /* station.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = station.hpp; sourceTree = "<group>"; };
+		1E4F855B274A819F004398FB /* utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utils.h; sourceTree = "<group>"; };
 		1E967F1C2701199D0021B4EE /* cpp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = cpp; sourceTree = BUILT_PRODUCTS_DIR; };
 		1E967F1F2701199D0021B4EE /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -58,6 +65,11 @@
 			isa = PBXGroup;
 			children = (
 				1E967F1F2701199D0021B4EE /* main.cpp */,
+				1E4F8558274A7051004398FB /* station.cpp */,
+				1E4F8559274A7051004398FB /* station.hpp */,
+				1E4F8555274A6FFE004398FB /* pipe.cpp */,
+				1E4F8556274A6FFE004398FB /* pipe.hpp */,
+				1E4F855B274A819F004398FB /* utils.h */,
 			);
 			path = cpp;
 			sourceTree = "<group>";
@@ -119,6 +131,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				1E967F202701199D0021B4EE /* main.cpp in Sources */,
+				1E4F8557274A6FFE004398FB /* pipe.cpp in Sources */,
+				1E4F855A274A7051004398FB /* station.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
