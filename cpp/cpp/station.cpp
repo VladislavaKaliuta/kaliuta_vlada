@@ -10,12 +10,12 @@
 
 using namespace std;
 
-int station::MaxID_ST = 0;
+int station::MaxID_st = 0;
 
 station::station()
 {
-    id_st = MaxID_ST++;
-    name = "Unknown";
+    id_st = MaxID_st++;
+    name_st = "Unknown";
     tsekh = 0;
     worktsekh = 0;
     effect = 0;
@@ -28,13 +28,13 @@ int station::GetID_ST() const
 
  void station::SetID_ST()
 {
-     id_st = MaxID_ST;
+     id_st = MaxID_st;
 }
 
 
 ostream& operator << (ostream& out, const station& s)
 {
-    out << "MaxID_ST:" << station::MaxID_ST << "\tstation id:" << s.id_st << "\tname:" << s.name << "\ttsekh:" << s.tsekh << "\twork tsekh:" << s.worktsekh << "\tefficiency:" << s.effect << endl;
+    out << "MaxID_ST:" << station::MaxID_st << "\tstation id:" << s.id_st << "\tname:" << s.name_st << "\ttsekh:" << s.tsekh << "\twork tsekh:" << s.worktsekh << "\tefficiency:" << s.effect << endl;
     return out;
 }
 
@@ -45,7 +45,7 @@ istream& operator >> (istream& in, station& s)
     cout << "Enter name:";
     //cin.ignore(2000, '\n');
     cin>>ws;
-    getline(cin, s.name);
+    getline(cin, s.name_st);
     cout << "Enter tsekh:";
     s.tsekh = GetCorrectNumber(0, 50);
     cout << "Enter  work tsekh:";

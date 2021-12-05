@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <iostream>
+#include <string>
 
 #endif /* pipe_hpp */
 
@@ -20,6 +21,7 @@ public:
     
 
     static int MaxID;
+    std::string name;
     double length;
     double diameter;
     bool vremont;

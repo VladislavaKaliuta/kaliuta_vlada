@@ -20,8 +20,8 @@ class station
     
 public:
 
-    static int MaxID_ST;
-    std::string name;
+    static int MaxID_st;
+    std::string name_st;
     int tsekh;
     int worktsekh;
     double effect;

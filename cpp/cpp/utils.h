@@ -9,6 +9,7 @@
 #define utils_h
 
 #include <iostream>
+#include <unordered_map>
 
 #endif /* utils_h */
 
