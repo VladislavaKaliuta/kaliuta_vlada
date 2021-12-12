@@ -9,6 +9,7 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include <tuple>
 #include <unordered_map>
 #include "pipe.hpp"
 #include "station.hpp"
@@ -27,14 +28,13 @@ void EditStation(station& s)
     s.EditWorktsekh(s);
 }
 
-void SavePipe(ofstream& fout, const pipe& p)
+/*void SavePipe(ofstream& fout, const pipe& p)
 {
     if (p.length != 0 && p.diameter != 0)
     {
     fout << "Pipe:" << endl << p.GetID() << endl << p.name << endl <<  p.length << endl << p.diameter << endl << p.vremont << endl;
         }
-        /*else
-            cout << "Pipe didn't create!" << endl;*/
+        
        
     }
 
@@ -44,37 +44,54 @@ void SaveStation(ofstream& fout, const station& s)
     {
         fout << "Station:" << endl << s.GetID_ST() << endl << s.name_st << endl << s.tsekh << endl << s.worktsekh  << endl << s.effect << endl;
     }
-    /*else
-        cout << "Station didn't create!" << endl;*/
-}
+   
+}*/
 
- pipe LoadPipe(ifstream& fin)
- {
-     pipe p;
-     // fin >> p.SetID();
-     fin >> ws;
-     getline(fin, p.name);
-     fin >> p.length;
-     fin >> p.diameter;
-     fin >> p.vremont;
-     
-    
-     return p;
-    
-}
-
-station LoadStation(ifstream& fin)
+void Load(ifstream& fin, unordered_map<int, pipe>& pgroup, unordered_map<int, station>& sgroup)
 {
+    pipe p;
     station s;
-    //fin >> s.id_st;
-    fin >> ws;
-    getline(fin, s.name_st);
-    fin >> s.tsekh;
-    fin >> s.worktsekh;
-    fin >> s.effect;
-    return s;
+    int i = 0;
+    int p_size;
+    fin >> p_size;
+    while (p_size != 0)
+    {
+        fin >> p;
+        for (auto& [id, pipe] : pgroup)
+        {
+            if (p.GetID() == id)
+                i++;
+        }
+        if (i == 0)
+        {
+            p.MaxID++;
+            pgroup.emplace(p.MaxID, p);
+        }
+        else
+            i = 0;
+        --p_size;
+    }
 
-               
+    int j = 0;
+    int s_size;
+    fin >> s_size;
+    while (s_size != 0)
+    {
+        fin >> s;
+        for (auto& [id, station] : sgroup)
+        {
+            if (s.GetID_ST() == id)
+                j++;
+        }
+        if (j == 0)
+        {
+            s.MaxID_st++;
+            sgroup.emplace(s.MaxID_st, s);
+        }
+        else
+            j = 0;
+        --s_size;
+    }
 }
  
 void Printmenu()
@@ -85,43 +102,64 @@ void Printmenu()
     << "(4) Print Compressor station" << endl
     << "(5) Edit Pipe" << endl
     << "(6) Edit Station" << endl
-    << "(7) Save to file" << endl
-    << "(8) Load from file" << endl
-    << "(9) Find Pipe by filter" << endl
-    << "(10) Find Station by filter" << endl
+    << "(7) Delete Pipe" << endl
+    << "(8) Delete Station" << endl
+    << "(9) Save to file" << endl
+    << "(10) Load from file" << endl
+    << "(11) Find by filter" << endl
     << "(0) Exit" << endl
     << "Enter number, please:" << endl;
 }
 
-pipe& SelectPipe(vector<pipe>& pg)
+pipe& SelectPipe(unordered_map<int, pipe>& p)
 {
-    cout << "Enter index: ";
-    unsigned int index = GetCorrectNumber (1u, (unsigned int) pg.size());
-    return pg[index-1];
-}
-
-station& SelectStation(vector<station>& sg)
-{
+    /*if (p.size() == 0)
+  cout << "Pipe data didn't create! Please, enter them and try again." << endl;
+     else*/
+    cout << "Enter index (1," << p.size() << "): ";
+    unsigned int index = GetCorrectNumber(1u, (unsigned int) p.size());
+    return p[index];
     
-    cout << "Enter index: ";
-    unsigned int index = GetCorrectNumber (1u, (unsigned int) sg.size());
-    return sg[index-1];
-}
-
-void DeletePipe(vector<pipe>& pg)
-{
-    cout << "Enter index: ";
-    unsigned int index = GetCorrectNumber (1u, (unsigned int) pg.size());
-    pg.erase(pg.begin()+index );
+       
+           
+       
     
 }
-
-void DeleteStation(vector<station>& sg)
-{
     
+station& SelectStation(unordered_map<int, station>& s)
+{
+    /*if (s.size() == 0)
+        cout << "Station data didn't create! Please, enter them and try again." << endl;
+    else
+    */
+        cout << "Enter index (1," << s.size() << "): ";
+        unsigned int index = GetCorrectNumber (1u, (unsigned int) s.size());
+        return s[index];
+    
+    
+    
+}
+
+void DeletePipe(unordered_map<int, pipe>& p)
+{
+    /*if (p.size() == 0)
+  cout << "Pipe data didn't create! Please, enter them and try again." << endl;
+     else*/
     cout << "Enter index: ";
-    unsigned int index = GetCorrectNumber (1u, (unsigned int) sg.size());
-    sg.erase(sg.begin()+index);
+    unsigned int index = GetCorrectNumber (1u, (unsigned int) p.size());
+    p.erase(index );
+    
+}
+
+void DeleteStation(unordered_map<int, station>& s)
+{
+    /*if (s.size() == 0)
+        cout << "Station data didn't create! Please, enter them and try again." << endl;
+    else
+    */
+    cout << "Enter index: ";
+    unsigned int index = GetCorrectNumber (1u, (unsigned int) s.size());
+    s.erase(index);
 }
 
 template<typename T>
@@ -135,7 +173,7 @@ bool CheckByVremont (const pipe& p, bool param)
     return p.vremont == param;
 }
 template<typename T>
-vector <int> FindPipeByFilter(const vector<pipe>& pgroup, Filter<T> f, T param)
+vector <int> FindPipeByFilter(const unordered_map<int, pipe>& pgroup, Filter<T> f, T param)
 {
     vector <int> res;
     int i = 0;
@@ -158,11 +196,11 @@ bool CheckByName (const station& s,string param)
 }
 bool CheckByPercentOfNonWorkTsekh (const station& s,double param)
 {
-    double procent = (s.tsekh-s.worktsekh)*100/s.tsekh;
+    double procent = (s.Gettsekh()-s.Getworktsekh())*100/s.Gettsekh();
     return procent == param;
 }
 template<typename T>
-vector <int> FindStationByFilter(const vector<station>& sgroup, Filter_st<T> f, T param)
+vector <int> FindStationByFilter(const unordered_map<int, station>& sgroup, Filter_st<T> f, T param)
 {
     vector <int> res;
     int i = 0;
@@ -177,40 +215,42 @@ vector <int> FindStationByFilter(const vector<station>& sgroup, Filter_st<T> f, 
 }
 
 int main() {
-    unordered_map  <int, pipe> pgr = {};
-    unordered_map  <int, station> sgr = {};
+    unordered_map  <int, pipe> pgroup = {};
+    unordered_map  <int, station> sgroup = {};
     pipe p;
-    station cs;
-    vector<pipe> pgroup;
-    vector<station> sgroup;
-    
-   // pgroup.resize(3);
+    station s;
+    /*vector<pipe> pgroup;
+    vector<station> sgroup;*/
     
     while (1)
     {
         Printmenu();
-        switch (GetCorrectNumber(0, 10))
+        switch (GetCorrectNumber(0, 11))
         {
             case 1:
             {
-                pipe p;
+                
                 cin >> p;
-                pgroup.push_back(p);
+                pgroup.emplace (p.MaxID, p);
                 break;
             }
             case 2:
             {
-                station s;
+                
                 cin >> s;
-                sgroup.push_back(s);
+                sgroup.emplace (s.MaxID_st, s);
                 break;
             }
             case 3:
             {
                 if (pgroup.size() != 0)
                 {
-                    for (const auto& p:pgroup)
+                    for (const auto& [id, p]: pgroup)
+                    {
+                        cout << id;
                         cout << p << endl;
+                    }
+                                        
                 }
                 
                 else
@@ -222,8 +262,11 @@ int main() {
             {
                 if (sgroup.size() != 0)
                 {
-                    for (auto& s:sgroup)
+                    for (const auto& [id, s] : sgroup)
+                    {
+                        cout << id;
                         cout << s << endl;
+                    }
                 }
                 
                 else
@@ -236,18 +279,18 @@ int main() {
             {
                 if (pgroup.size() != 0)
                 {
-                    cout << "Do you want to edit all pipes or one? Please, enter '1' if all or '2' if multiple pipes: ";
+                    cout << "Please, enter '1' if you want to edit all pipes or '2' if several: ";
                     switch (GetCorrectNumber(1, 2))
                     {
                         case 1:
                         {
-                            for (auto&  p:pgroup)
+                            for (auto&  [id, p]:pgroup)
                                 EditPipe(p);
                             break;
                         }
                         case 2:
                         {
-                            cout << "How many pipes do you want to edit? Please, enter integer value of pipes (1, " << pgroup.size() << "):";
+                            cout << "Please, enter integer value of pipes (1, " << pgroup.size() << "):";
                             int n = GetCorrectNumber(1u, (unsigned int) pgroup.size());
                             for (int i = 0; i < n; i++)
                                 EditPipe(SelectPipe(pgroup));
@@ -264,12 +307,12 @@ int main() {
             {
                 if (sgroup.size() != 0)
                 {
-                    cout << "Do you want to edit all stations or one? Please, enter '1' if all or 2 if multiple stations: ";
+                    cout << "Please, enter '1' if you want to edit all stations or '2' if several : ";
                     switch (GetCorrectNumber(1, 2))
                     {
                         case 1:
                         {
-                            for (auto& s:sgroup)
+                            for (auto& [id, s]:sgroup)
                                 EditStation(s);
                             break;
                         }
@@ -290,6 +333,16 @@ int main() {
             }
             case 7:
             {
+                DeletePipe(pgroup);
+                break;
+            }
+            case 8:
+            {
+                DeleteStation(sgroup);
+                break;
+            }
+            case 9:
+            {
                 
                 string filename;
                 cout << "Enter file name, please:";
@@ -304,24 +357,31 @@ int main() {
                 }
                 else
                 {
-                    fout << pgroup.size() << endl;
+                    /*fout << pgroup.size() << endl;
                     for(pipe& p:pgroup)
                         SavePipe(fout, p);
                     fout << sgroup.size() << endl;
                     for (station& s:sgroup)
-                        SaveStation(fout, s);
+                        SaveStation(fout, s);*/
+                    fout << pgroup.size() << endl;
+                    fout << sgroup.size() << endl;
+                    for (const auto& [id, p] : pgroup)
+                        fout << p;
+                    for (const auto& [id, k] : sgroup)
+                        fout << k;
                         
                         fout.close();
                 }
                 break;
             }
          
-            case 8:
+            case 10:
             {
                 
                 string filename;
-                string str;
                 cout << "Enter file name, please:";
+                cin.ignore(10000, '\n');
+                getline(cin, filename);
                 ifstream fin;
                 fin.open(filename + ".txt", ios::in);
                 
@@ -331,40 +391,85 @@ int main() {
                 }
                 else
                 {
-                    while (!fin.eof())
-                    {
-                        getline(fin, str);
-                        {
-                            if (str == "Pipe:")
-                            pgroup.push_back(LoadPipe(fin));
-                            
-                        }
-                        if (str == "Station:")
-                        {
-                            sgroup.push_back(LoadStation(fin));
-                           
-                        }
-                    }
-                                    
-                   
-                        //fin.close();
+                    Load(fin, pgroup, sgroup);
+                    fin.close();
                     
                 }
                 break;
             }
-            case 9:
+            
+            case 11:
             {
-                string name = "Unknown";
-               for (int i: FindPipeByFilter(pgroup, CheckByName, name))
-                   cout << sgroup[i];
-                break;
+                cout << "What do you want to do?" << endl
+                << "(1) Filter pipes" << endl
+                << "(2) Filter stations" << endl;
+            switch (GetCorrectNumber(1,2))
+            {
+                case 1:
+                {
+                    cout << "What filter do you want to use?" << endl
+                    << "(1) Check by name" << endl
+                    << "(2) Check by sign 'under repair'" << endl;
+                    switch (GetCorrectNumber(1,2))
+                    {
+                        case 1:
+                        {
+                            string name;
+                            cin >> ws;
+                            cin.ignore(2000, '\n');
+                            cout << "Enter pipe name: ";
+                            getline(cin, name);
+                            for (int i: FindPipeByFilter(pgroup, CheckByName, name))
+                            cout << pgroup[i];
+                            break;
+                        }
+                        case 2:
+                        {
+                            cout << "Enter '0' if pipes don't work and '1' if pipes work: ";
+                            bool vremont = GetCorrectNumber(0, 1);
+                            for (int i: FindPipeByFilter(pgroup, CheckByVremont, vremont))
+                            cout << pgroup[i];
+                            break;
+                        }
+                    }
+                    
+                    break;
+                }
+                case 2:
+                {
+                    cout << "What filter do you want to use?" << endl
+                    << "(1) Check by name" << endl
+                    << "(2) Check by percent of non-working tsekh" << endl;
+                    switch (GetCorrectNumber(1,2))
+                    {
+                        case 1:
+                        {
+                            string name;
+                            cin >> ws;
+                            cin.ignore(2000, '\n');
+                            cout << "Enter station name: ";
+                            getline(cin, name);
+                            for (int i: FindStationByFilter(sgroup, CheckByName, name))
+                            cout << sgroup[i];
+                            break;
+                        }
+                        case 2:
+                        {
+                            break;
+                        }
+                    }
+                    
+                    break;
+                }
+                
+                default:
+                {
+                    cout << "wrong action" << endl;
+                }
+                                    
             }
-            case 10:
-            {
-                string name = "Unknown";
-               for (int i: FindStationByFilter(sgroup, CheckByName, name))
-                   cout << sgroup[i];
                 break;
+            
             }
                 
             case 0:

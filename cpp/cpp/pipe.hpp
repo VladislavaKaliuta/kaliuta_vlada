@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <string>
+#include <fstream>
 
 #endif /* pipe_hpp */
 
@@ -35,5 +36,7 @@ public:
     
     friend std::ostream& operator << (std::ostream& out, const pipe& p);
     friend std::istream& operator >> (std::istream& in, pipe& p);
+    friend std::ifstream& operator >> (std::ifstream& in, pipe& p);
+        friend std::ofstream& operator << (std::ofstream& out, const pipe& p);
    
 };

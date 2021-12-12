@@ -50,15 +50,31 @@ istream& operator >> (istream& in, station& s)
     s.tsekh = GetCorrectNumber(0, 50);
     cout << "Enter  work tsekh:";
     s.worktsekh = GetCorrectNumber(0, s.tsekh);
-   /* while (s.worktsekh > s.tsekh || s.worktsekh < 0)
-    {
-    cout << "Enter  work tsekh (<tsekh) again:";
-    s.worktsekh = GetCorrectNumber(0, 50);
-    }*/
     cout<<"Enter  efficiency:";
     s.effect = GetCorrectNumber(0,10);
     return in;
 }
+
+ifstream& operator >> (std::ifstream& in, station& s)
+{
+    in >> s.id_st;
+    in >> s.name_st;
+    in >> s.tsekh;
+    in >> s.worktsekh;
+    in >> s.effect;
+    return in;
+}
+
+ofstream& operator << (std::ofstream& out, const station& s)
+{
+    out << s.GetID_ST() << endl
+        << s.name_st << endl
+        << s.Gettsekh() << endl
+        << s.Getworktsekh() << endl
+        << s.effect << endl;
+    return out;
+}
+
 
 void station::EditWorktsekh(station& s)
 {

@@ -18,7 +18,7 @@ pipe::pipe()
     name = "Unknown";
     length = 0;
     diameter = 0;
-    vremont = 1;
+    vremont = false;
     
 }
 
@@ -36,6 +36,8 @@ int pipe::GetID() const
 ostream& operator << (ostream& out, const pipe& p)
 {
     out <<  "MaxID:" << pipe::MaxID << "\tpipe id:" << p.id << "\tname:" << p.name <<"\tlength:" << p.length << "\tdiameter:" << p.diameter << "\tsign:" << endl;
+    if (p.vremont)
+            out << "Pipe needs repair" << endl;
     return out;
 }
 istream& operator >> (istream& in, pipe& p)
@@ -49,10 +51,29 @@ istream& operator >> (istream& in, pipe& p)
     p.length = GetCorrectNumber(0.0, 1000.0);
     cout << "Enter diameter:";
     p.diameter = GetCorrectNumber(0.0, 1000.0);
-    //cout << "Enter sign:";
-    p.vremont = false;
+    //p.vremont = false;
     return in;
 }
+std::ifstream& operator >> (std::ifstream& in, pipe& p)
+{
+    in >> p.id;
+    in >> p.name;
+    in >> p.diameter;
+    in >> p.length;
+    in >> p.vremont;
+    return in;
+}
+
+std::ofstream& operator << (std::ofstream& out, const pipe& p)
+{
+    out << p.GetID() << endl
+        << p.name << endl
+        << p.diameter << endl
+        << p.length << endl
+        << p.vremont << endl;
+    return out;
+}
+
 
 void pipe::EditVremont(pipe& p)
 {
